@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
 import { 
   Heart, 
   MessageCircle, 
@@ -137,16 +137,15 @@ import {
   Linkedin,
   Music,
   Youtube
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-interface Props {
-  content: any[]
-}
 
-const props = defineProps<Props>()
+const props = defineProps({
+  content: Array
+});
 
-const selectedTimeframe = ref('30d')
-const selectedChannel = ref('all')
+const selectedTimeframe = ref('30d');
+const selectedChannel = ref('all');
 
 const keyMetrics = computed(() => [
   {
@@ -177,7 +176,7 @@ const keyMetrics = computed(() => [
     trend: 'up',
     icon: Eye
   }
-])
+]);
 
 const channelPerformance = computed(() => [
   { name: 'Instagram', engagement: '4.2K', percentage: 85, icon: Instagram },
@@ -186,7 +185,7 @@ const channelPerformance = computed(() => [
   { name: 'LinkedIn', engagement: '1.9K', percentage: 42, icon: Linkedin },
   { name: 'TikTok', engagement: '1.5K', percentage: 35, icon: Music },
   { name: 'YouTube', engagement: '1.2K', percentage: 28, icon: Youtube }
-])
+]);
 
 const topContent = computed(() => [
   {
@@ -239,9 +238,9 @@ const topContent = computed(() => [
     shares: 156,
     engagementRate: 6.5
   }
-])
+]);
 
-const getChannelBadgeClass = (channel: string) => {
+const getChannelBadgeClass = (channel) => {
   const classes = {
     Instagram: 'bg-pink-100 text-pink-800',
     Facebook: 'bg-blue-100 text-blue-800',
@@ -249,7 +248,7 @@ const getChannelBadgeClass = (channel: string) => {
     LinkedIn: 'bg-indigo-100 text-indigo-800',
     TikTok: 'bg-purple-100 text-purple-800',
     YouTube: 'bg-red-100 text-red-800'
-  }
-  return classes[channel as keyof typeof classes] || 'bg-gray-100 text-gray-800'
-}
+  };
+  return classes[channel] || 'bg-gray-100 text-gray-800';
+};
 </script>

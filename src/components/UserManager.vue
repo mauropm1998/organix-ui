@@ -181,22 +181,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Plus, Edit, Trash2, Users, Shield, User as UserIcon } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User } from '../types';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  users: User[];
-}
 
-const props = defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  users: Array
+});
 
-const emit = defineEmits<{
-  addUser: [user: Omit<User, 'id'>];
-  updateUser: [id: string, updates: Partial<User>];
-  deleteUser: [id: string];
-}>();
+const emit = defineEmits(['addUser', 'updateUser', 'deleteUser']);
 
 const { language } = useLanguage();
 
@@ -206,7 +200,7 @@ const formData = ref({
   name: '',
   email: '',
   password: '',
-  adminType: 'operator' as const
+  adminType: 'operator'
 });
 
 const handleSubmit = () => {
@@ -221,7 +215,7 @@ const handleSubmit = () => {
   showForm.value = false;
 };
 
-const handleEdit = (userToEdit: User) => {
+const handleEdit = (userToEdit) => {
   editingUser.value = userToEdit;
   formData.value = {
     name: userToEdit.name,

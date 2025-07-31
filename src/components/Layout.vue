@@ -77,24 +77,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Sun, Moon, LogOut, Home, FileText, Video, Package, Users, Calendar, BarChart3, Languages } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User, Company } from '../types';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  company: Company;
-  theme: 'light' | 'dark';
-  activeTab: string;
-}
 
-defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  company: Object,
+  theme: String,
+  activeTab: String
+});
 
-defineEmits<{
-  logout: [];
-  toggleTheme: [];
-  tabChange: [tab: string];
-}>();
+defineEmits(['logout', 'toggleTheme', 'tabChange']);
 
 const { language, toggleLanguage } = useLanguage();
 
@@ -105,6 +99,6 @@ const navItems = computed(() => [
   { id: 'calendar', label: t('calendar', language.value), icon: Calendar },
   { id: 'performance', label: t('performance', language.value), icon: BarChart3 },
   { id: 'products', label: t('products', language.value), icon: Package },
-  { id: 'users', label: t('users', language.value), icon: Users }
+  ...(props.user.adminType === 'admin' ? [{ id: 'users', label: t('users', language.value), icon: Users }] : [])
 ]);
 </script>

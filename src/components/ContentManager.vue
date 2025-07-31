@@ -540,28 +540,21 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { User, Content, Product, Draft } from '../types'
 import { Plus, Edit, Trash2, ArrowRightCircle, BarChart3 } from 'lucide-vue-next'
-import { CONTENT_TYPES, CONTENT_STATUSES, CHANNELS } from '../data/mockData'
-import { useLanguage } from '../composables/useLanguage'
-import { t } from '../translations'
+import { CONTENT_TYPES, CONTENT_STATUSES, CHANNELS } from '../data/mockData.js'
+import { useLanguage } from '../composables/useLanguage.js'
+import { t } from '../translations/index.js'
 
-interface Props {
-  user: User
-  content: Content[]
-  products: Product[]
-  users: User[]
-  drafts: Draft[]
-}
 
-const props = defineProps<Props>()
+const props = defineProps({
+  user: Object,
+  content: Array,
+  products: Array,
+  users: Array,
+  drafts: Array
+})
 
-const emit = defineEmits<{
-  addContent: [content: Omit<Content, 'id' | 'creationDate'>]
-  updateContent: [id: string, updates: Partial<Content>]
-  deleteContent: [id: string]
-  transformDraft: [draftId: string, contentData: Omit<Content, 'id' | 'creationDate' | 'name' | 'type'>]
-}>()
+const emit = defineEmits(['addContent', 'updateContent', 'deleteContent', 'transformDraft'])
 
 const { language } = useLanguage()
 
@@ -581,20 +574,11 @@ const formData = ref({
   creator: props.user.id,
   postDate: '',
   producer: props.user.id,
-  status: 'pending' as const,
-  channels: [] as string[]
+  status: 'pending',
+  channels: []
 })
 
-const channelMetrics = ref<{
-  [channel: string]: {
-    likes: number
-    comments: number
-    shares: number
-    siteVisits: number
-    newAccounts: number
-    postClicks: number
-  }
-}>({})
+const channelMetrics = ref({})
 
 // Filter content based on user role
 const userContent = computed(() => {
@@ -671,7 +655,7 @@ const closeTransformModal = () => {
   resetForm()
 }
 
-const handleEdit = (item: Content) => {
+const handleEdit = (item) => {
   editingContent.value = item
   formData.value = {
     name: item.name,
@@ -686,17 +670,17 @@ const handleEdit = (item: Content) => {
   showForm.value = true
 }
 
-const canEdit = (item: Content) => {
+const canEdit = (item) => {
   return props.user.adminType === 'admin' || item.creator === props.user.id || item.producer === props.user.id
 }
 
-const canUpdateStatus = (item: Content) => {
+const canUpdateStatus = (item) => {
   return props.user.adminType === 'admin' || item.producer === props.user.id
 }
 
-const handleOpenMetricsModal = (item: Content) => {
+const handleOpenMetricsModal = (item) => {
   selectedContentForMetrics.value = item
-  const initialMetrics: { [channel: string]: { likes: number; comments: number; shares: number; siteVisits: number; newAccounts: number; postClicks: number; } } = {}
+  const initialMetrics = {}
   
   item.channels.forEach(channel => {
     initialMetrics[channel] = item.metrics?.channelMetrics?.[channel] || {
@@ -731,7 +715,7 @@ const closeMetricsModal = () => {
   channelMetrics.value = {}
 }
 
-const updateChannelMetric = (channel: string, metric: string, value: number) => {
+const updateChannelMetric = (channel, metric, value) => {
   if (!channelMetrics.value[channel]) {
     channelMetrics.value[channel] = {
       likes: 0,
@@ -742,26 +726,26 @@ const updateChannelMetric = (channel: string, metric: string, value: number) => 
       postClicks: 0
     }
   }
-  channelMetrics.value[channel][metric as keyof typeof channelMetrics.value[channel]] = value
+  channelMetrics.value[channel][metric] = value
 }
 
-const getCreatorName = (creatorId: string) => {
+const getCreatorName = (creatorId) => {
   return props.users.find(u => u.id === creatorId)?.name || 'Unknown'
 }
 
-const getProductName = (productId: string) => {
+const getProductName = (productId) => {
   return props.products.find(p => p.id === productId)?.name || 'Unknown'
 }
 
-const getProducerName = (producerId: string) => {
+const getProducerName = (producerId) => {
   return props.users.find(u => u.id === producerId)?.name || 'Unknown'
 }
 
-const formatDate = (date: Date) => {
+const formatDate = (date) => {
   return date.toLocaleDateString()
 }
 
-const getStatusClass = (status: string) => {
+const getStatusClass = (status) => {
   const baseClass = 'text-sm rounded-full px-2 py-1'
   switch (status) {
     case 'posted':

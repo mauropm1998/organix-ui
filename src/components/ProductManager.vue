@@ -123,22 +123,16 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { Plus, Edit, Trash2, Package, Box } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User, Product } from '../types';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  products: Product[];
-}
 
-const props = defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  products: Array
+});
 
-const emit = defineEmits<{
-  addProduct: [product: Omit<Product, 'id'>];
-  updateProduct: [id: string, updates: Partial<Product>];
-  deleteProduct: [id: string];
-}>();
+const emit = defineEmits(['addProduct', 'updateProduct', 'deleteProduct']);
 
 const { language } = useLanguage();
 
@@ -164,7 +158,7 @@ const handleSubmit = (e: Event) => {
   showForm.value = false;
 };
 
-const handleEdit = (product: Product) => {
+const handleEdit = (product) => {
   editingProduct.value = product;
   formData.name = product.name;
   formData.image = product.image || '';

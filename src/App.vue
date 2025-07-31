@@ -3,13 +3,13 @@
     <!-- Login/SignUp Forms -->
     <SignUpForm 
       v-if="!user && !company && showSignUp"
-      @sign-up="signUp" 
-      @back-to-login="showSignUp = false" 
+      @signUp="signUp" 
+      @backToLogin="showSignUp = false" 
     />
     <LoginForm 
       v-else-if="!user || !company"
       @login="login" 
-      @show-sign-up="showSignUp = true" 
+      @showSignUp="showSignUp = true" 
     />
     
     <!-- Main Application -->
@@ -18,10 +18,10 @@
       :user="user"
       :company="company"
       :theme="theme"
-      :active-tab="activeTab"
+      :activeTab="activeTab"
       @logout="logout"
-      @toggle-theme="toggleTheme"
-      @tab-change="setActiveTab"
+      @toggleTheme="toggleTheme"
+      @tabChange="setActiveTab"
     >
       <component :is="currentComponent" v-bind="componentProps" />
     </Layout>
@@ -30,9 +30,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useAuth } from './composables/useAuth';
-import { useTheme } from './composables/useTheme';
-import { useData } from './composables/useData';
+import { useAuth } from './composables/useAuth.js';
+import { useTheme } from './composables/useTheme.js';
+import { useData } from './composables/useData.js';
 import LoginForm from './components/LoginForm.vue';
 import SignUpForm from './components/SignUpForm.vue';
 import Layout from './components/Layout.vue';

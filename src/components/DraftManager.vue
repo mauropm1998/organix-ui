@@ -202,24 +202,18 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Plus, Edit, Trash2, CheckCircle, Clock, XCircle } from 'lucide-vue-next';
-import { CONTENT_TYPES, DRAFT_STATUSES } from '../data/mockData';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User, Draft } from '../types';
+import { CONTENT_TYPES, DRAFT_STATUSES } from '../data/mockData.js';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  drafts: Draft[];
-  users: User[];
-}
 
-const props = defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  drafts: Array,
+  users: Array
+});
 
-const emit = defineEmits<{
-  'add-draft': [draft: Omit<Draft, 'id' | 'createdAt'>];
-  'update-draft': [id: string, updates: Partial<Draft>];
-  'delete-draft': [id: string];
-}>();
+const emit = defineEmits(['addDraft', 'updateDraft', 'deleteDraft']);
 
 const { language } = useLanguage();
 
@@ -231,7 +225,7 @@ const formData = ref({
   name: '',
   type: '',
   richtext: '',
-  status: 'pending' as const
+  status: 'pending'
 });
 
 // Filter drafts based on user role
@@ -254,10 +248,10 @@ const handleSubmit = (e: Event) => {
   e.preventDefault();
   
   if (editingDraft.value) {
-    emit('update-draft', editingDraft.value.id, formData.value);
+    emit('updateDraft', editingDraft.value.id, formData.value);
     editingDraft.value = null;
   } else {
-    emit('add-draft', {
+    emit('addDraft', {
       ...formData.value,
       creator: props.user.id
     });
@@ -267,7 +261,7 @@ const handleSubmit = (e: Event) => {
   showForm.value = false;
 };
 
-const handleEdit = (draft: Draft) => {
+const handleEdit = (draft) => {
   editingDraft.value = draft;
   formData.value = {
     name: draft.name,
@@ -310,11 +304,11 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const canEdit = (draft: Draft) => {
+const canEdit = (draft) => {
   return props.user.adminType === 'admin' || draft.creator === props.user.id;
 };
 
-const getUserName = (userId: string) => {
+const getUserName = (userId) => {
   const user = props.users.find(u => u.id === userId);
   return user?.name || 'Unknown';
 };

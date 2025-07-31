@@ -137,7 +137,7 @@
 
       <div class="mt-6 text-center">
         <button
-          @click="$emit('back-to-login')"
+          @click="$emit('backToLogin')"
           class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
         >
           <ArrowLeft class="w-4 h-4 mr-1" />
@@ -151,18 +151,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Building2, User, Mail, Lock, ArrowLeft } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface SignUpData {
-  companyData: { name: string; adminId: string };
-  adminData: { name: string; email: string; password: string };
-}
 
-const emit = defineEmits<{
-  'sign-up': [companyData: { name: string; adminId: string }, adminData: { name: string; email: string; password: string }];
-  'back-to-login': [];
-}>();
+const emit = defineEmits(['signUp', 'backToLogin']);
 
 const { language } = useLanguage();
 
@@ -207,7 +200,7 @@ const handleAdminSubmit = (e: Event) => {
     return;
   }
 
-  emit('sign-up', 
+  emit('signUp', 
     { name: companyData.value.name, adminId: '' },
     { 
       name: adminData.value.name, 

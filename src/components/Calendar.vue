@@ -282,19 +282,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { ChevronLeft, ChevronRight, Filter, X, Box } from 'lucide-vue-next';
-import { CHANNELS, CONTENT_STATUSES } from '../data/mockData';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User, Content, Product } from '../types';
+import { CHANNELS, CONTENT_STATUSES } from '../data/mockData.js';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  content: Content[];
-  products: Product[];
-  users: User[];
-}
 
-const props = defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  content: Array,
+  products: Array,
+  users: Array
+});
 const { language } = useLanguage();
 
 const currentDate = ref(new Date());
@@ -343,25 +341,25 @@ const days = computed(() => {
   return calendarDays;
 });
 
-const getContentForDate = (date: Date) => {
+const getContentForDate = (date) => {
   return filteredContent.value.filter(item => {
     const postDate = new Date(item.postDate);
     return postDate.toDateString() === date.toDateString();
   });
 };
 
-const navigateMonth = (direction: number) => {
+const navigateMonth = (direction) => {
   const year = currentDate.value.getFullYear();
   const month = currentDate.value.getMonth();
   currentDate.value = new Date(year, month + direction, 1);
 };
 
-const isToday = (date: Date) => {
+const isToday = (date) => {
   const today = new Date();
   return date.toDateString() === today.toDateString();
 };
 
-const isCurrentMonth = (date: Date) => {
+const isCurrentMonth = (date) => {
   return date.getMonth() === currentDate.value.getMonth();
 };
 
@@ -369,19 +367,19 @@ const clearFilters = () => {
   filters.value = { product: '', channel: '', status: '', user: '' };
 };
 
-const setSelectedContent = (content: Content) => {
+const setSelectedContent = (content) => {
   selectedContent.value = content;
 };
 
-const getProductName = (productId: string) => {
+const getProductName = (productId) => {
   return props.products.find(p => p.id === productId)?.name || 'Unknown';
 };
 
-const getUserName = (userId: string) => {
+const getUserName = (userId) => {
   return props.users.find(u => u.id === userId)?.name || 'Unknown';
 };
 
-const getStatusClass = (status: string) => {
+const getStatusClass = (status) => {
   const baseClass = 'inline-block px-3 py-1 text-sm rounded-full';
   switch (status) {
     case 'posted':

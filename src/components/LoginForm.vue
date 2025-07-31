@@ -74,13 +74,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { AlertCircle, UserPlus } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-defineEmits<{
-  login: [email: string, password: string];
-  showSignUp: [];
-}>();
+const emit = defineEmits(['login', 'showSignUp']);
 
 const { language } = useLanguage();
 const email = ref('');
@@ -90,7 +87,7 @@ const error = ref('');
 const handleSubmit = () => {
   error.value = '';
   
-  const success = $emit('login', email.value, password.value);
+  const success = emit('login', email.value, password.value);
   if (!success) {
     error.value = t('invalidCredentials', language.value);
   }

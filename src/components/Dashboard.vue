@@ -118,17 +118,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { FileText, Video, CheckCircle, PlayCircle } from 'lucide-vue-next';
-import { useLanguage } from '../composables/useLanguage';
-import { t } from '../translations';
-import type { User, Draft, Content } from '../types';
+import { useLanguage } from '../composables/useLanguage.js';
+import { t } from '../translations/index.js';
 
-interface Props {
-  user: User;
-  drafts: Draft[];
-  content: Content[];
-}
 
-const props = defineProps<Props>();
+const props = defineProps({
+  user: Object,
+  drafts: Array,
+  content: Array
+});
 const { language } = useLanguage();
 
 // Filter data based on user role
@@ -160,7 +158,7 @@ const contentStats = computed(() => ({
   finished: userContent.value.filter(c => c.status === 'finished').length
 }));
 
-const getStatusClass = (status: string) => {
+const getStatusClass = (status) => {
   const baseClass = 'px-2 py-1 text-xs rounded-full';
   switch (status) {
     case 'approved':
@@ -172,7 +170,7 @@ const getStatusClass = (status: string) => {
   }
 };
 
-const getContentStatusClass = (status: string) => {
+const getContentStatusClass = (status) => {
   const baseClass = 'px-2 py-1 text-xs rounded-full';
   switch (status) {
     case 'posted':
