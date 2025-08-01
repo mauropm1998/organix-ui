@@ -4,9 +4,9 @@
  // https://vitejs.dev/config/
  export default defineConfig({
    plugins: [vue()],
-+  css: {
-+    postcss: './postcss.config.js',
-+  },
+  css: {
+    postcss: './postcss.config.js',
+  },
    optimizeDeps: {
      exclude: ['lucide-vue-next'],
    },
