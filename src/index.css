@@ -11,14 +11,14 @@
     font-family: 'Arimo', system-ui, sans-serif;
     font-weight: 600;
   }
-}
-
-@layer base {
+  
   html {
     transition: background-color 0.2s ease-in-out;
   }
   
   body {
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    margin: 0;
+    padding: 0;
   }
 }
