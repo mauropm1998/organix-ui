@@ -2,30 +2,31 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-      <div class="px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
-              Organix
-            </h1>
-            <nav class="hidden md:flex space-x-6">
-              <button
-                v-for="tab in tabs"
-                :key="tab.id"
-                @click="activeTab = tab.id"
-                class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
-                :class="activeTab === tab.id 
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' 
-                  : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white'"
-              >
-                <component :is="tab.icon" class="w-4 h-4 inline mr-2" />
-                {{ t(tab.label) }}
-              </button>
-            </nav>
-          </div>
-          
-          <div class="flex items-center space-x-4">
-            <!-- Language Toggle -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+                Organix
+              </h1>
+              <nav class="hidden md:flex space-x-6">
+                <button
+                  v-for="tab in tabs"
+                  :key="tab.id"
+                  @click="activeTab = tab.id"
+                  class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                  :class="activeTab === tab.id 
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' 
+                    : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white'"
+                >
+                  <component :is="tab.icon" class="w-4 h-4 inline mr-2" />
+                  {{ t(tab.label) }}
+                </button>
+              </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+              <!-- Language Toggle -->
             <button
               @click="toggleLanguage"
               class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -58,6 +59,7 @@
               </button>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </header>
@@ -78,7 +80,9 @@
 
     <!-- Main Content -->
     <main class="flex-1">
-      <component :is="currentComponent" />
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <component :is="currentComponent" />
+      </div>
     </main>
   </div>
 </template>
@@ -117,18 +121,18 @@ const activeTab = ref('dashboard')
 
 const tabs = computed(() => {
   const allTabs = [
-    { id: 'dashboard', label: 'navigation.dashboard', icon: LayoutDashboard, component: Dashboard },
-    { id: 'drafts', label: 'navigation.drafts', icon: FileText, component: DraftManager },
-    { id: 'content', label: 'navigation.content', icon: Video, component: ContentManager },
-    { id: 'calendar', label: 'navigation.calendar', icon: CalendarIcon, component: Calendar },
-    { id: 'performance', label: 'navigation.performance', icon: BarChart3, component: Performance }
+    { id: 'dashboard', label: 'dashboard', icon: LayoutDashboard, component: Dashboard },
+    { id: 'drafts', label: 'drafts', icon: FileText, component: DraftManager },
+    { id: 'content', label: 'content', icon: Video, component: ContentManager },
+    { id: 'calendar', label: 'calendar', icon: CalendarIcon, component: Calendar },
+    { id: 'performance', label: 'performance', icon: BarChart3, component: Performance }
   ]
 
   // Add admin-only tabs
   if (user.value?.adminType === 'admin') {
     allTabs.push(
-      { id: 'products', label: 'navigation.products', icon: Package, component: ProductManager },
-      { id: 'users', label: 'navigation.users', icon: Users, component: UserManager }
+      { id: 'products', label: 'products', icon: Package, component: ProductManager },
+      { id: 'users', label: 'users', icon: Users, component: UserManager }
     )
   }
 
@@ -139,6 +143,7 @@ const currentComponent = computed(() => {
   const tab = tabs.value.find(t => t.id === activeTab.value)
   return tab?.component || Dashboard
 })
+
 </script>
 
 <style scoped>

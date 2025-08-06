@@ -5,7 +5,7 @@
         {{ t('dashboard', language) }}
       </h2>
       <p class="text-gray-600 dark:text-gray-400">
-        {{ t('welcomeBack', language) }}, {{ user.name }}! {{ t('contentOverview', language) }}
+        {{ t('welcomeBack', language) }}<span v-if="user">, {{ user.name }}</span>! {{ t('contentOverview', language) }}
       </p>
     </div>
 
@@ -131,15 +131,15 @@ const { language } = useLanguage();
 
 // Filter data based on user role
 const userDrafts = computed(() => 
-  props.user.adminType === 'admin' 
-    ? props.drafts 
-    : props.drafts.filter(d => d.creator === props.user.id)
+  props.user?.adminType === 'admin' 
+    ? props.drafts || []
+    : props.drafts?.filter(d => d.creator === props.user?.id) || []
 );
 
 const userContent = computed(() =>
-  props.user.adminType === 'admin'
-    ? props.content
-    : props.content.filter(c => c.creator === props.user.id || c.producer === props.user.id)
+  props.user?.adminType === 'admin'
+    ? props.content || []
+    : props.content?.filter(c => c.creator === props.user?.id || c.producer === props.user?.id) || []
 );
 
 // Statistics

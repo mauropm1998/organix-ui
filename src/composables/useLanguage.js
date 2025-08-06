@@ -1,4 +1,5 @@
 import { ref, onMounted, watch } from 'vue';
+import { translations } from '../translations/index.js';
 
 /**
  * Composable for language management
@@ -30,5 +31,10 @@ export const useLanguage = () => {
     language.value = lang;
   };
 
-  return { language, toggleLanguage, setLanguage };
+  const t = (key, lang = null) => {
+    const currentLang = lang || language.value;
+    return translations[currentLang]?.[key] || key;
+  };
+
+  return { language, toggleLanguage, setLanguage, t };
 };
