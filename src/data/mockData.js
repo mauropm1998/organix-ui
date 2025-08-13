@@ -1,77 +1,3 @@
-/**
- * @typedef {Object} User
- * @property {string} id
- * @property {string} name
- * @property {string} email
- * @property {string} password
- * @property {'admin'|'operator'} adminType
- * @property {string} companyId
- */
-
-/**
- * @typedef {Object} Company
- * @property {string} id
- * @property {string} name
- * @property {Date} createdAt
- * @property {string} adminId
- */
-
-/**
- * @typedef {Object} Draft
- * @property {string} id
- * @property {string} name
- * @property {string} type
- * @property {string} creator
- * @property {string} richtext
- * @property {'approved'|'pending'|'not approved'} status
- * @property {Date} createdAt
- * @property {string} companyId
- */
-
-/**
- * @typedef {Object} Product
- * @property {string} id
- * @property {string} name
- * @property {string} companyId
- * @property {string} [image]
- */
-
-/**
- * @typedef {Object} ContentMetrics
- * @property {number} views
- * @property {number} likes
- * @property {number} reach
- * @property {number} engagement
- * @property {number} comments
- * @property {number} shares
- * @property {Object} [channelMetrics]
- */
-
-/**
- * @typedef {Object} Content
- * @property {string} id
- * @property {string} name
- * @property {string} type
- * @property {string} product
- * @property {string} creator
- * @property {Date} creationDate
- * @property {Date} postDate
- * @property {string} producer
- * @property {'pending'|'canceled'|'posted'|'in-production'|'finished'} status
- * @property {string[]} channels
- * @property {string} companyId
- * @property {ContentMetrics} [metrics]
- */
-
-export const mockCompanies = [
-  {
-    id: '1',
-    name: 'Organix Demo Company',
-    createdAt: new Date('2024-01-01'),
-    adminId: '1'
-  }
-];
-
 export const mockUsers = [
   {
     id: '1',
@@ -95,24 +21,6 @@ export const mockUsers = [
     email: 'sarah@organix.com',
     password: 'operator123',
     adminType: 'operator',
-    companyId: '1'
-  }
-];
-
-export const mockProducts = [
-  {
-    id: '1',
-    name: 'Product Alpha',
-    companyId: '1'
-  },
-  {
-    id: '2',
-    name: 'Product Beta',
-    companyId: '1'
-  },
-  {
-    id: '3',
-    name: 'Product Gamma',
     companyId: '1'
   }
 ];
@@ -150,14 +58,23 @@ export const mockDrafts = [
   }
 ];
 
-const generateMockMetrics = () => ({
-  views: Math.floor(Math.random() * 10000) + 1000,
-  likes: Math.floor(Math.random() * 1000) + 100,
-  reach: Math.floor(Math.random() * 15000) + 2000,
-  engagement: Math.floor(Math.random() * 500) + 50,
-  comments: Math.floor(Math.random() * 200) + 10,
-  shares: Math.floor(Math.random() * 300) + 20
-});
+export const mockProducts = [
+  {
+    id: '1',
+    name: 'Product Alpha',
+    companyId: '1'
+  },
+  {
+    id: '2',
+    name: 'Product Beta',
+    companyId: '1'
+  },
+  {
+    id: '3',
+    name: 'Product Gamma',
+    companyId: '1'
+  }
+];
 
 export const mockContent = [
   {
@@ -172,7 +89,7 @@ export const mockContent = [
     status: 'in-production',
     channels: ['Instagram', 'Facebook', 'TikTok'],
     companyId: '1',
-    metrics: generateMockMetrics()
+    metrics: {}
   },
   {
     id: '2',
@@ -186,39 +103,11 @@ export const mockContent = [
     status: 'pending',
     channels: ['LinkedIn', 'YouTube'],
     companyId: '1',
-    metrics: generateMockMetrics()
-  },
-  {
-    id: '3',
-    name: 'Spring Collection Teaser',
-    type: 'Marketing Campaign',
-    product: '1',
-    creator: '2',
-    creationDate: new Date('2024-02-01'),
-    postDate: new Date('2024-03-01'),
-    producer: '2',
-    status: 'posted',
-    channels: ['Instagram', 'TikTok'],
-    companyId: '1',
-    metrics: generateMockMetrics()
-  },
-  {
-    id: '4',
-    name: 'Customer Success Story',
-    type: 'Social Content',
-    product: '3',
-    creator: '3',
-    creationDate: new Date('2024-02-10'),
-    postDate: new Date('2024-02-28'),
-    producer: '3',
-    status: 'finished',
-    channels: ['LinkedIn', 'Facebook'],
-    companyId: '1',
-    metrics: generateMockMetrics()
+    metrics: {}
   }
 ];
 
-export const CHANNELS = ['TikTok', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube'];
 export const CONTENT_TYPES = ['Marketing Campaign', 'Product Announcement', 'Social Content', 'Blog Post', 'Video Content'];
 export const DRAFT_STATUSES = ['approved', 'pending', 'not approved'];
+export const CHANNELS = ['TikTok', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube'];
 export const CONTENT_STATUSES = ['pending', 'canceled', 'posted', 'in-production', 'finished'];

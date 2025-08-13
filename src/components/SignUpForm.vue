@@ -1,178 +1,118 @@
+
+
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          {{ t('auth.createAccount') }}
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          {{ t('auth.signUpSubtitle') }}
-        </p>
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors">
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ t('createOrganixAccount', language) }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ step === 1 ? t('setupCompany', language) : t('createAdminAccount', language) }}</p>
       </div>
-      
-      <form class="mt-8 space-y-6" @submit.prevent="handleSignUp">
-        <div class="space-y-4">
-          <!-- Company Name -->
-          <div>
-            <label for="companyName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('auth.companyName') }}
-            </label>
-            <input
-              id="companyName"
-              v-model="form.companyName"
-              type="text"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              :placeholder="t('auth.companyNamePlaceholder')"
-            />
-          </div>
-
-          <!-- Admin Name -->
-          <div>
-            <label for="adminName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('auth.adminName') }}
-            </label>
-            <input
-              id="adminName"
-              v-model="form.adminName"
-              type="text"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              :placeholder="t('auth.adminNamePlaceholder')"
-            />
-          </div>
-
-          <!-- Email -->
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('auth.email') }}
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              :placeholder="t('auth.emailPlaceholder')"
-            />
-          </div>
-
-          <!-- Password -->
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('auth.password') }}
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              :placeholder="t('auth.passwordPlaceholder')"
-            />
-          </div>
-
-          <!-- Confirm Password -->
-          <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('auth.confirmPassword') }}
-            </label>
-            <input
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              type="password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              :placeholder="t('auth.confirmPasswordPlaceholder')"
-            />
-          </div>
-        </div>
-
-        <!-- Error Message -->
-        <div v-if="error" class="text-red-600 dark:text-red-400 text-sm text-center">
-          {{ error }}
-        </div>
-
-        <!-- Submit Button -->
+      <div class="flex items-center justify-center mb-8">
+        <div :class="['w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium', step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600']">1</div>
+        <div :class="['w-16 h-1 mx-2', step >= 2 ? 'bg-blue-600' : 'bg-gray-200']"></div>
+        <div :class="['w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium', step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600']">2</div>
+      </div>
+      <form v-if="step === 1" @submit.prevent="handleCompanySubmit" class="space-y-6">
         <div>
-          <button
-            type="submit"
-            :disabled="loading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span v-if="loading" class="mr-2">
-              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            </span>
-            {{ loading ? t('common.loading') : t('auth.createAccount') }}
-          </button>
+          <label for="companyName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ t('companyName', language) }}
+          </label>
+          <input type="text" id="companyName" v-model="companyData.name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('enterCompanyName', language)" required />
         </div>
-
-        <!-- Login Link -->
-        <div class="text-center">
-          <button
-            type="button"
-            @click="$emit('switchToLogin')"
-            class="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm"
-          >
-            {{ t('auth.alreadyHaveAccount') }}
-          </button>
+        <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">{{ error }}</div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">{{ t('continue', language) }}</button>
+      </form>
+      <form v-else @submit.prevent="handleAdminSubmit" class="space-y-6">
+        <div>
+          <label for="adminName" class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <!-- User (lucide) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-400 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M16 16a4 4 0 0 0-8 0"/></svg>
+            {{ t('adminName', language) }}
+          </label>
+          <input type="text" id="adminName" v-model="adminData.name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('enterAdminName', language)" required />
+        </div>
+        <div>
+          <label for="adminEmail" class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <!-- Mail (lucide) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-400 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 6-8.97 6.48a2 2 0 0 1-2.06 0L2 6"/></svg>
+            {{ t('email', language) }}
+          </label>
+          <input type="email" id="adminEmail" v-model="adminData.email" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('enterAdminEmail', language)" required />
+        </div>
+        <div>
+          <label for="adminPassword" class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <!-- Lock (lucide) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-400 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            {{ t('password', language) }}
+          </label>
+          <input type="password" id="adminPassword" v-model="adminData.password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('enterPassword', language)" required />
+        </div>
+        <div>
+          <label for="confirmPassword" class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <!-- Lock (lucide) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-400 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            {{ t('confirmPassword', language) }}
+          </label>
+          <input type="password" id="confirmPassword" v-model="adminData.confirmPassword" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('confirmYourPassword', language)" required />
+        </div>
+        <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">{{ error }}</div>
+        <div class="flex space-x-3">
+          <button type="button" @click="step = 1" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">{{ t('back', language) }}</button>
+          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">{{ t('createAccount', language) }}</button>
         </div>
       </form>
+      <div class="mt-6 text-center">
+        <button @click="goToLogin" class="inline-flex items-center text-base text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          {{ t('backToLogin', language) }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useAuth } from '../composables/useAuth.js'
-import { useLanguage } from '../composables/useLanguage.js'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { t } from '../translations/index.js'
+import { useLanguage } from '../hooks/useLanguage.js'
 
-defineEmits(['switchToLogin'])
-
-const { signUp } = useAuth()
-const { t } = useLanguage()
-
-const loading = ref(false)
+const { language } = useLanguage()
+const router = useRouter()
+const step = ref(1)
+const companyData = ref({ name: '' })
+const adminData = ref({ name: '', email: '', password: '', confirmPassword: '' })
 const error = ref('')
 
-const form = reactive({
-  companyName: '',
-  adminName: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
-
-const handleSignUp = async () => {
+function handleCompanySubmit() {
+  if (!companyData.value.name.trim()) {
+    error.value = t('companyNameRequired', language.value)
+    return
+  }
   error.value = ''
-  
-  if (form.password !== form.confirmPassword) {
-    error.value = t('auth.passwordMismatch')
+  step.value = 2
+}
+
+function handleAdminSubmit() {
+  error.value = ''
+  if (!adminData.value.name.trim() || !adminData.value.email.trim() || !adminData.value.password.trim()) {
+    error.value = t('allFieldsRequired', language.value)
     return
   }
-
-  if (form.password.length < 6) {
-    error.value = t('auth.passwordTooShort')
+  if (adminData.value.password !== adminData.value.confirmPassword) {
+    error.value = t('passwordsDoNotMatch', language.value)
     return
   }
-
-  loading.value = true
-
-  try {
-    await signUp({
-      companyName: form.companyName,
-      adminName: form.adminName,
-      email: form.email,
-      password: form.password
-    })
-  } catch (err) {
-    error.value = err.message || t('auth.signUpError')
-  } finally {
-    loading.value = false
+  if (adminData.value.password.length < 6) {
+    error.value = t('passwordMinLength', language.value)
+    return
   }
+  // Aqui você pode adicionar lógica de cadastro real
+  // Simula sucesso
+  router.push('/login')
+}
+
+function goToLogin() {
+  router.push('/login')
 }
 </script>
-
-<style scoped>
-/* Component styles */
-</style>

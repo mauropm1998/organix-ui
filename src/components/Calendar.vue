@@ -1,164 +1,132 @@
+
 <template>
-  <div class="calendar-container">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ t('calendar.title') }}</h2>
-      <div class="flex gap-2">
-        <button
-          @click="previousMonth"
-          class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-        >
-          <ChevronLeft class="w-5 h-5" />
-        </button>
-        <button
-          @click="nextMonth"
-          class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-        >
-          <ChevronRight class="w-5 h-5" />
-        </button>
-      </div>
+  <div class="space-y-6 w-full mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+  <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('calendar', language) }}</h2>
+      <button class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-base font-semibold" @click="showFilters = !showFilters">
+        <lucide-filter class="w-4 h-4 mr-2" />
+        {{ t('filters', language) }}
+      </button>
     </div>
 
+    <!-- Filtros -->
+    <div v-if="showFilters" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t('filters', language) }}</h3>
+        <button @click="clearFilters" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">{{ t('clearAll', language) }}</button>
+      </div>
+      <CalendarFilters :filters="filters" :products="products" :channels="channels" :statuses="statuses" :users="users" :t="t" :language="language" />
+    </div>
+
+    <!-- Calendar Card -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-          {{ currentMonthYear }}
-        </h3>
+      <!-- Calendar Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <button @click="prevMonth" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" :aria-label="t('previousMonth', language)">
+          <lucide-chevron-left class="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        </button>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ monthLabel }}</h3>
+        <button @click="nextMonth" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" :aria-label="t('nextMonth', language)">
+          <lucide-chevron-right class="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        </button>
       </div>
-
-      <div class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-600">
-        <div
-          v-for="day in weekDays"
-          :key="day"
-          class="bg-gray-50 dark:bg-gray-700 p-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300"
-        >
-          {{ day }}
-        </div>
-
-        <div
-          v-for="date in calendarDates"
-          :key="`${date.date}-${date.month}`"
-          class="bg-white dark:bg-gray-800 min-h-[120px] p-2 relative"
-          :class="{
-            'opacity-50': !date.isCurrentMonth,
-            'bg-blue-50 dark:bg-blue-900/20': date.isToday
-          }"
-        >
-          <div class="text-sm font-medium text-gray-800 dark:text-white mb-2">
-            {{ date.date }}
-          </div>
-          
-          <div class="space-y-1">
-            <div
-              v-for="content in getContentForDate(date.fullDate)"
-              :key="content.id"
-              class="text-xs p-1 rounded truncate"
-              :class="getContentStatusClass(content.status)"
-              :title="content.name"
-            >
-              {{ content.name }}
-            </div>
-          </div>
-        </div>
+      <!-- Calendar Grid -->
+      <div class="p-6">
+        <CalendarGrid :days="calendarDays" :products="products" :language="language" @select="openDetail" />
       </div>
     </div>
+
+    <ContentDetailModal v-if="showDetail" :show="showDetail" :content="selectedContent" :product="selectedProduct" :creator="selectedCreator" :producer="selectedProducer" :t="t" :language="language" @close="closeDetail" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { useLanguage } from '../composables/useLanguage.js'
-import { useData } from '../composables/useData.js'
+import { ref, computed } from 'vue'
+import { useLanguage } from '../hooks/useLanguage.js'
+import { t } from '../translations/index.js'
+import { mockContent, mockProducts, mockUsers, CHANNELS, CONTENT_STATUSES } from '../data/mockData.js'
+import CalendarFilters from './calendar/CalendarFilters.vue'
+import CalendarGrid from './calendar/CalendarGrid.vue'
+import ContentDetailModal from './calendar/ContentDetailModal.vue'
+import { ChevronLeft as LucideChevronLeft, ChevronRight as LucideChevronRight, Filter as LucideFilter } from 'lucide-vue-next'
 
-const { t } = useLanguage()
-const { content } = useData()
+const { language } = useLanguage()
+const content = ref([...mockContent])
+const products = ref([...mockProducts])
+const users = ref([...mockUsers])
+const channels = CHANNELS
+const statuses = CONTENT_STATUSES
 
 const currentDate = ref(new Date())
+const filters = ref({ product: '', channel: '', status: '', user: '' })
+const showFilters = ref(false)
 
-const weekDays = computed(() => [
-  t('calendar.days.sun'),
-  t('calendar.days.mon'),
-  t('calendar.days.tue'),
-  t('calendar.days.wed'),
-  t('calendar.days.thu'),
-  t('calendar.days.fri'),
-  t('calendar.days.sat')
-])
+const monthLabel = computed(() => {
+  return currentDate.value.toLocaleString(language.value === 'pt' ? 'pt-PT' : 'en-US', { month: 'long', year: 'numeric' })
+})
 
-const currentMonthYear = computed(() => {
-  return currentDate.value.toLocaleDateString('pt-BR', {
-    month: 'long',
-    year: 'numeric'
+function prevMonth() {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
+}
+function nextMonth() {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
+}
+function clearFilters() {
+  filters.value = { product: '', channel: '', status: '', user: '' }
+}
+
+const filteredContent = computed(() => {
+  return content.value.filter(c => {
+    if (filters.value.product && c.product !== filters.value.product) return false
+    if (filters.value.channel && !(c.channels || []).includes(filters.value.channel)) return false
+    if (filters.value.status && c.status !== filters.value.status) return false
+    if (filters.value.user && c.creator !== filters.value.user && c.producer !== filters.value.user) return false
+    return true
   })
 })
 
-const calendarDates = computed(() => {
-  const year = currentDate.value.getFullYear()
-  const month = currentDate.value.getMonth()
-  
+function getDaysInMonth(date) {
+  const year = date.getFullYear()
+  const month = date.getMonth()
   const firstDay = new Date(year, month, 1)
   const lastDay = new Date(year, month + 1, 0)
-  const startDate = new Date(firstDay)
-  startDate.setDate(startDate.getDate() - firstDay.getDay())
-  
-  const dates = []
-  const today = new Date()
-  
-  for (let i = 0; i < 42; i++) {
-    const date = new Date(startDate)
-    date.setDate(startDate.getDate() + i)
-    
-    dates.push({
-      date: date.getDate(),
-      month: date.getMonth(),
-      year: date.getFullYear(),
-      fullDate: date.toISOString().split('T')[0],
-      isCurrentMonth: date.getMonth() === month,
-      isToday: date.toDateString() === today.toDateString()
+  const days = []
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const dayDate = new Date(year, month, d)
+    days.push({
+      date: dayDate.toISOString(),
+      label: d,
+      content: filteredContent.value.filter(c => {
+        if (!c.postDate) return false
+        const post = new Date(c.postDate)
+        return post.getFullYear() === year && post.getMonth() === month && post.getDate() === d
+      })
     })
   }
-  
-  return dates
-})
-
-const getContentForDate = (date) => {
-  return content.value.filter(item => {
-    if (!item.postDate) return false
-    const postDate = new Date(item.postDate).toISOString().split('T')[0]
-    return postDate === date
-  })
+  return days
 }
 
-const getContentStatusClass = (status) => {
-  const classes = {
-    'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-    'in-production': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-    'posted': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-    'canceled': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
-    'finished': 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
-  }
-  return classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
-}
+const calendarDays = computed(() => getDaysInMonth(currentDate.value))
 
-const previousMonth = () => {
-  const newDate = new Date(currentDate.value)
-  newDate.setMonth(newDate.getMonth() - 1)
-  currentDate.value = newDate
-}
+const showDetail = ref(false)
+const selectedContent = ref(null)
+const selectedProduct = ref(null)
+const selectedCreator = ref(null)
+const selectedProducer = ref(null)
 
-const nextMonth = () => {
-  const newDate = new Date(currentDate.value)
-  newDate.setMonth(newDate.getMonth() + 1)
-  currentDate.value = newDate
+function openDetail(item) {
+  selectedContent.value = item
+  selectedProduct.value = products.value.find(p => p.id === item.product)
+  selectedCreator.value = users.value.find(u => u.id === item.creator)
+  selectedProducer.value = users.value.find(u => u.id === item.producer)
+  showDetail.value = true
 }
-
-onMounted(() => {
-  // Component mounted
-})
+function closeDetail() {
+  showDetail.value = false
+  selectedContent.value = null
+  selectedProduct.value = null
+  selectedCreator.value = null
+  selectedProducer.value = null
+}
 </script>
-
-<style scoped>
-.calendar-container {
-  @apply p-6;
-}
-</style>

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Arimo', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Arimo', system-ui, sans-serif;
+    font-weight: 600;
+  }
+}
+
+@layer base {
+  html {
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  body {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+}
