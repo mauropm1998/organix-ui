@@ -20,8 +20,10 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
           <span class="text-sm">{{ error }}</span>
         </div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-          {{ t('signIn', language) }}
+        <button type="submit" :disabled="isLoading" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+          <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin" />
+          <LogIn v-else class="w-4 h-4" />
+          <span>{{ isLoading ? t('signingIn', language) : t('signIn', language) }}</span>
         </button>
       </form>
       <div class="mt-6 text-center">
@@ -38,26 +40,46 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Loader2, LogIn } from 'lucide-vue-next'
 import { t } from '../translations/index.js'
 import { useLanguage } from '../hooks/useLanguage.js'
-import { mockUsers } from '../data/mockData.js'
+import { useAuth } from '../hooks/useAuth.js'
 
 const { language } = useLanguage()
+const { login } = useAuth()
 const router = useRouter()
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const isLoading = ref(false)
 
-function handleLogin() {
-  const user = mockUsers.find(u => u.email === email.value && u.password === password.value)
-  if (user) {
-    error.value = ''
-    // Aqui você pode salvar o usuário logado em um store ou localStorage
-    router.push('/')
-  } else {
-    error.value = t('invalidCredentials', language.value) || 'E-mail ou senha inválidos'
+async function handleLogin() {
+  if (isLoading.value) return
+  
+  isLoading.value = true
+  error.value = ''
+  
+  try {
+    const result = await login({
+      email: email.value,
+      password: password.value
+    })
+    
+    if (result.success) {
+      // Login bem-sucedido, redirecionar para dashboard
+      router.push('/')
+    } else {
+      // Exibir erro de login
+      error.value = result.error || t('invalidCredentials', language.value) || 'E-mail ou senha inválidos'
+    }
+  } catch (err) {
+    error.value = t('loginError', language.value) || 'Erro ao fazer login. Tente novamente.'
+    console.error('Login error:', err)
+  } finally {
+    isLoading.value = false
   }
 }
+
 function goToSignUp() {
   router.push('/signup')
 }

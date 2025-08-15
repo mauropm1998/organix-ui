@@ -37,9 +37,9 @@
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex items-center justify-end space-x-2">
-              <!-- Transform button (only for PENDING status) -->
+              <!-- Transform button (only for APPROVED status) -->
               <button 
-                v-if="draft.status === 'PENDING' && canEdit(draft)" 
+                v-if="draft.status === 'APPROVED' && canEdit(draft)" 
                 @click="$emit('transform', draft)" 
                 class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors" 
                 :title="t('transformToContent', language)"

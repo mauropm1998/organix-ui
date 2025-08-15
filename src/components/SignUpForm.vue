@@ -20,7 +20,11 @@
           <input type="text" id="companyName" v-model="companyData.name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" :placeholder="t('enterCompanyName', language)" required />
         </div>
         <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">{{ error }}</div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">{{ t('continue', language) }}</button>
+        <button type="submit" :disabled="isLoading" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+          <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin" />
+          <Building v-else class="w-4 h-4" />
+          <span>{{ isLoading ? t('processing', language) : t('continue', language) }}</span>
+        </button>
       </form>
       <form v-else @submit.prevent="handleAdminSubmit" class="space-y-6">
         <div>
@@ -57,8 +61,12 @@
         </div>
         <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">{{ error }}</div>
         <div class="flex space-x-3">
-          <button type="button" @click="step = 1" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">{{ t('back', language) }}</button>
-          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">{{ t('createAccount', language) }}</button>
+          <button type="button" @click="step = 1" :disabled="isLoading" class="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">{{ t('back', language) }}</button>
+          <button type="submit" :disabled="isLoading" class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+            <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin" />
+            <UserPlus v-else class="w-4 h-4" />
+            <span>{{ isLoading ? t('creatingAccount', language) : t('createAccount', language) }}</span>
+          </button>
         </div>
       </form>
       <div class="mt-6 text-center">
@@ -74,15 +82,19 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Loader2, UserPlus, Building } from 'lucide-vue-next'
 import { t } from '../translations/index.js'
 import { useLanguage } from '../hooks/useLanguage.js'
+import { useAuth } from '../hooks/useAuth.js'
 
 const { language } = useLanguage()
+const { signup } = useAuth()
 const router = useRouter()
 const step = ref(1)
 const companyData = ref({ name: '' })
 const adminData = ref({ name: '', email: '', password: '', confirmPassword: '' })
 const error = ref('')
+const isLoading = ref(false)
 
 function handleCompanySubmit() {
   if (!companyData.value.name.trim()) {
@@ -93,8 +105,12 @@ function handleCompanySubmit() {
   step.value = 2
 }
 
-function handleAdminSubmit() {
+async function handleAdminSubmit() {
+  if (isLoading.value) return
+  
   error.value = ''
+  
+  // Validações do frontend
   if (!adminData.value.name.trim() || !adminData.value.email.trim() || !adminData.value.password.trim()) {
     error.value = t('allFieldsRequired', language.value)
     return
@@ -107,9 +123,33 @@ function handleAdminSubmit() {
     error.value = t('passwordMinLength', language.value)
     return
   }
-  // Aqui você pode adicionar lógica de cadastro real
-  // Simula sucesso
-  router.push('/login')
+  
+  isLoading.value = true
+  
+  try {
+    // Preparar dados para a API de signup
+    const signupData = {
+      companyName: companyData.value.name,
+      adminName: adminData.value.name,
+      email: adminData.value.email,
+      password: adminData.value.password
+    }
+    
+    const result = await signup(signupData)
+    
+    if (result.success) {
+      // Conta criada com sucesso, redirecionar para dashboard
+      router.push('/')
+    } else {
+      // Exibir erro do servidor
+      error.value = result.error || t('failedToCreateAccount', language.value)
+    }
+  } catch (err) {
+    error.value = t('signupError', language.value) || 'Erro ao criar conta. Tente novamente.'
+    console.error('Signup error:', err)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 function goToLogin() {

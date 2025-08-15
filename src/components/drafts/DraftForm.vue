@@ -98,7 +98,7 @@ watch(() => props.editingDraft, (val) => {
   if (val) {
     Object.assign(formData, val)
   } else {
-    Object.assign(formData, { name: '', type: '', content: '', status: 'PENDING' })
+    Object.assign(formData, { name: '', type: '', content: '', status: 'pending' })
   }
 })
 

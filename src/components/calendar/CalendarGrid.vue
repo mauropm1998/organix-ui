@@ -18,15 +18,15 @@
             isToday(cell.date) ? 'text-blue-600 dark:text-blue-400' : ''
           ]">{{ cell.label }}</div>
           <div class="space-y-1">
-            <template v-for="(item, idx) in cell.content.slice(0, 3)" :key="item.id">
+            <template v-for="item in cell.content.slice(0, 3)" :key="item.id">
               <div
                 @click="$emit('select', item)"
                 :class="[
                   'text-xs p-1 rounded cursor-pointer hover:opacity-80 transition-opacity truncate font-medium',
-                  item.status === 'posted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                  : item.status === 'in-production' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                  : item.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                  : item.status === 'finished' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                  item.status === 'POSTED' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  : item.status === 'IN_PRODUCTION' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                  : item.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                  : item.status === 'FINISHED' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
                   : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                 ]"
                 :title="item.name + ' - ' + getProductName(item.product)"
@@ -36,7 +36,11 @@
                 <div class="truncate opacity-60">{{ t(item.status, props.language) }}</div>
               </div>
             </template>
-            <div v-if="cell.content.length > 3" class="text-xs text-gray-500 dark:text-gray-400 text-center">
+            <div 
+              v-if="cell.content.length > 3" 
+              @click="$emit('showAll', cell.content, cell.date)"
+              class="text-xs text-gray-500 dark:text-gray-400 text-center cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
               +{{ cell.content.length - 3 }} {{ t('more', props.language) }}
             </div>
           </div>
@@ -53,7 +57,7 @@ const props = defineProps({
   products: Array,
   language: String
 })
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'showAll'])
 const weekDays = computed(() => [
   t('sun', props.language),
   t('mon', props.language),

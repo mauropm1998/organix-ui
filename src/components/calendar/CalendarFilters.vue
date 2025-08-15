@@ -11,7 +11,7 @@
   <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ t('channels', language) }}</label>
       <select v-model="filters.channel" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
         <option value="">{{ t('allChannels', language) }}</option>
-        <option v-for="channel in channels" :key="channel" :value="channel">{{ channel }}</option>
+        <option v-for="channel in channels" :key="channel.id" :value="channel.id">{{ channel.name }}</option>
       </select>
     </div>
     <div class="w-full">
